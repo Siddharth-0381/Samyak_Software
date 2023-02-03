@@ -1,13 +1,13 @@
 import './App.css';
-import UserEntryList from "./Components/UserDataEntry/index"
+//import UserEntryList from "./Components/UserDataEntry/index"
 // import UserDataEntry1 from './Components/UserDataEntry/index1'
-// import UserList from './Components/userList/index'
-
+import UserList from './Components/userList/index'
+import 'bootstrap/dist/css/bootstrap.min.css';
 function App() {
   return (
     <div className="App">
-      <UserEntryList></UserEntryList>
-      {/* <UserList></UserList> */}
+      {/* <UserEntryList></UserEntryList> */}
+      <UserList></UserList>
       {/* <UserDataEntry1></UserDataEntry1> */}
     </div>
   );

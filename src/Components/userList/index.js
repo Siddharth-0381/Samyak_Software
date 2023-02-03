@@ -1,9 +1,31 @@
 import React, { Component } from 'react';
 import { BsDownload, BsUpload } from "react-icons/bs";
+import startFirebase from '../firebase';
+import {ref, onValue} from 'firebase/database';
+import { Table } from 'react-bootstrap';
+
+const db= startFirebase();
 
 class Index extends Component {
 
-    
+    constructor(){
+        super();
+        this.state={
+            tableData:[]
+        }
+    }
+    componentDidMount(){
+        const dbRef = ref(db, 'user');
+        onValue(dbRef, (snapshot)=>{
+            let records=[];
+            snapshot.forEach(childSnapshot=>{
+                let keyName=childSnapshot.key;
+                let data=childSnapshot.val();
+                records.push({"key":keyName, "data":data});
+            });
+            this.setState({tableData:records});
+        });
+    }
 
     render() {
         return (
@@ -31,9 +53,45 @@ class Index extends Component {
                                 <button className='btn btn-outline-primary my-2 my-sm-0 m-1' type='submit'> <BsUpload/> Export</button>
                             </form>
                         </div>
+                        <div>
+                            <Table>
+                                <thead>
+                                <tr>
+                                <th>Index</th>
+                                <th>CashApp Name</th>
+                                <th>CustCashApp Name</th>
+                                <th>Total Loaded</th>
+                                <th>Total Redemeed</th>
+                                <th>GameID</th>
+                                <th>GameName</th>
+                                <th>Referral Bonus</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                    {this.state.tableData.map((rowdata, index)=>{
+                                        return(
+                                        <tr>
+                                            <td>{index}</td>
+                                            <td>{rowdata.data.cashApp}</td>
+                                            <td>{rowdata.data.customerCashAppName}</td>
+                                            <td>{rowdata.data.amountLoaded}</td>
+                                            <td>{rowdata.data.redeemedTotal}</td>
+                                            <td>{rowdata.key}</td>
+                                            <td>{rowdata.data.gameName}</td>
+                                            <td>{rowdata.data.bonus}</td>
+                                        </tr>
+                                        )
+                                    })}
+
+                                </tbody>
+                            </Table>
+
+                        </div>
                     </div>
                 </div>
             </div>
+
+
         );
     }
 }
