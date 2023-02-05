@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import startFirebase from '../firebase';
 import {ref, set} from 'firebase/database';
-import { v4 as uuid } from 'uuid'
+import { v4 as uuid } from 'uuid';
 class Index extends Component {
 
     constructor(props) {

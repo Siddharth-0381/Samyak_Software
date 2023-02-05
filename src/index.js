@@ -1,15 +1,22 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
-import App from './App';
 import reportWebVitals from './reportWebVitals';
-
+import App  from './App';
+import { BrowserRouter as Router,
+  Routes,
+  Route
+ } from 'react-router-dom';
+ import UserDataEntry from './Components/UserDataEntry/index'
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
+  <Router>
+    <Routes>
+      <Route path='/' element={<App/>}/>
+      <Route path='/userDetails' element={<UserDataEntry/>}/>
+    </Routes>
+  </Router>
 );
 
 

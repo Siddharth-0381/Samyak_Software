@@ -38,8 +38,6 @@ class Index extends Component {
         remove(userData);
     }
 
-
-    
     render() {
         return (
             
@@ -57,10 +55,9 @@ class Index extends Component {
                     </div>
                     <div className='card-body'>
                         <div className='addDetails-div'>
-                        
-                            <Link to="/userDataEntry">
-                                <button type='submit' className='btn btn-primary'>Add Details</button>
-                            </Link>
+                                <button type='submit' className='btn btn-primary'>
+                                    <Link to='/userDetails' className='link'>Add Details</Link>    
+                                </button>
                             <form className="form-inline my-2 my-lg-0">
                                 <input className="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search"/>
                                 <button className="btn btn-outline-primary my-2 my-sm-0" type="submit">Search</button>
@@ -100,9 +97,7 @@ class Index extends Component {
                                             <td>
                                                 <BsEye style={{margin: "5px"}} />
                                                 <BsPencilSquare style={{margin: "5px"}}/>
-                                                <button onClick={() => this.deleteData(rowdata.key)}>
-                                                    <BsTrash style={{margin: "5px"}} />
-                                                </button>    
+                                                <BsTrash style={{margin: "5px"}} onClick={() => this.deleteData(rowdata.key)}/>    
                                             </td>
                                         </tr>
                                         
