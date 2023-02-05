@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
-import { BsDownload, BsUpload } from "react-icons/bs";
+import { BsDownload, BsEye, BsPencilSquare, BsTrash, BsUpload } from "react-icons/bs";
 import startFirebase from '../firebase';
-import {ref, onValue} from 'firebase/database';
+import {ref, onValue, remove} from 'firebase/database';
 import { Table } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
+
 
 const db= startFirebase();
 
@@ -11,9 +13,12 @@ class Index extends Component {
     constructor(){
         super();
         this.state={
-            tableData:[]
+            tableData:[],
+            gameID:''
         }
+        
     }
+
     componentDidMount(){
         const dbRef = ref(db, 'user');
         onValue(dbRef, (snapshot)=>{
@@ -24,11 +29,20 @@ class Index extends Component {
                 records.push({"key":keyName, "data":data});
             });
             this.setState({tableData:records});
+            this.setState({gameID: records["gameID"]})
         });
     }
 
+    deleteData = (key) =>{
+        const userData = ref(db, "user/" + key);
+        remove(userData);
+    }
+
+
+    
     render() {
         return (
+            
             <div>
                 <div className='card border-secondary mb-4 m-5' style={{background: '#E3F6FF'}}>
                 <div className='card-header'>
@@ -43,7 +57,10 @@ class Index extends Component {
                     </div>
                     <div className='card-body'>
                         <div className='addDetails-div'>
-                            <button type='submit' className='btn btn-primary'>Add Details</button>
+                        
+                            <Link to="/userDataEntry">
+                                <button type='submit' className='btn btn-primary'>Add Details</button>
+                            </Link>
                             <form className="form-inline my-2 my-lg-0">
                                 <input className="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search"/>
                                 <button className="btn btn-outline-primary my-2 my-sm-0" type="submit">Search</button>
@@ -58,13 +75,14 @@ class Index extends Component {
                                 <thead>
                                 <tr>
                                 <th>Index</th>
-                                <th>CashApp Name</th>
-                                <th>CustCashApp Name</th>
+                                <th>Cashpp Name</th>
+                                <th>Cashapp Name</th>
                                 <th>Total Loaded</th>
                                 <th>Total Redemeed</th>
                                 <th>GameID</th>
                                 <th>GameName</th>
                                 <th>Referral Bonus</th>
+                                <th></th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -79,13 +97,19 @@ class Index extends Component {
                                             <td>{rowdata.key}</td>
                                             <td>{rowdata.data.gameName}</td>
                                             <td>{rowdata.data.bonus}</td>
+                                            <td>
+                                                <BsEye style={{margin: "5px"}} />
+                                                <BsPencilSquare style={{margin: "5px"}}/>
+                                                <button onClick={() => this.deleteData(rowdata.key)}>
+                                                    <BsTrash style={{margin: "5px"}} />
+                                                </button>    
+                                            </td>
                                         </tr>
+                                        
                                         )
                                     })}
-
                                 </tbody>
                             </Table>
-
                         </div>
                     </div>
                 </div>

@@ -1,14 +1,19 @@
 import './App.css';
-//import UserEntryList from "./Components/UserDataEntry/index"
-// import UserDataEntry1 from './Components/UserDataEntry/index1'
-import UserList from './Components/userList/index'
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { BrowserRouter as Router, Routes, Route} from "react-router-dom";
+import UserDataEntry from './Components/UserDataEntry/index';
+import UserDataList from './Components/userList/index';
+
+
 function App() {
   return (
     <div className="App">
-      {/* <UserEntryList></UserEntryList> */}
-      <UserList></UserList>
-      {/* <UserDataEntry1></UserDataEntry1> */}
+       <Router>
+          <Routes>
+            <Route exact path="/" element={UserDataList} />
+            <Route path="/userDataEntr" element={UserDataEntry} />
+          </Routes>
+        </Router>
     </div>
   );
 }

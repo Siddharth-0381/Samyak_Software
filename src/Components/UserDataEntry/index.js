@@ -50,7 +50,7 @@ class Index extends Component {
     }
 
     handleCashTag = (event) => {
-        this.setState({cashName : event.target.value})
+        this.setState({cashApp : event.target.value})
         const cashName = event.target.value
         if(cashName === 'Kyla Jones') {
             this.setState({cashTag : '$F53535'})
