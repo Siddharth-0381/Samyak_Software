@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import startFirebase from '../firebase';
 import {ref, set} from 'firebase/database';
 import { v4 as uuid } from 'uuid';
+import { Link } from 'react-router-dom';
 class Index extends Component {
 
     constructor(props) {
@@ -32,6 +33,7 @@ class Index extends Component {
 
         this.handleShift = this.handleShift.bind()
         this.addData = this.addData.bind(this)
+        this.handleTotal = this.handleTotal.bind()
     }
 
     handledropDown = (event) => {
@@ -89,24 +91,30 @@ class Index extends Component {
 
     storeAmountLoaded = (event) => {
         this.setState({amountLoaded : event.target.value})
-        this.handleTotal()
+        
     }
 
     storeBonus = (event) => {
         this.setState({bonus : event.target.value})
-        this.handleTotal()
+        
     }
 
     handleTotal = () => {
-        const amtLoaded = this.state.amountLoaded
-        const bonus = this.state.bonus
+        var amtLoaded = this.state.amountLoaded
+        var bonus = this.state.bonus
 
-        this.setState({amountTotal : ( parseInt(amtLoaded) + parseInt(bonus))})
-
+        var total = parseInt(amtLoaded, 10) + parseInt(bonus, 10)
+        total = total.toString
+        this.setState({amountTotal : total})
     }
 
     handleRedeemedTotal = () => {
-        
+        const widAmt = this.state.withdrawalAmount
+        const tip = this.state.tips
+
+        const redTotal = (parseInt(widAmt) + parseInt(tip)).toString;
+        this.setState({redeemedTotal: redTotal})
+        return redTotal;
     }
 
     componentDidMount(){
@@ -136,6 +144,7 @@ class Index extends Component {
             tips : this.state.tips,
             redeemedTotal : this.state.redeemedTotal,
             amountTransferred : this.state.amountTransferred,
+            dropDown : this.state.dropDown, 
             unique : this.state.unique
         }
     }
@@ -164,6 +173,7 @@ class Index extends Component {
             tips : data.tips,
             redeemedTotal : data.redeemedTotal,
             amountTransferred : data.amountTransferred,
+            dropDown : data.dropDown,
             unique : data.unique
         })
         .then(()=> {alert('Data added successfully!')})
@@ -171,7 +181,6 @@ class Index extends Component {
     }
 
     render() {
-        console.log(this.state.timeHours)
         return (
             <div>
                 <div className='card border-secondary mb-4 m-5' style={{background: '#E3F6FF'}}>
@@ -290,27 +299,25 @@ class Index extends Component {
                                             <td>
                                                 <label><b>Amount Recieved : </b></label><br></br>
                                                 <input className='input' type='number'  id='amtRec' required
-                                                onChange={e =>{this.setState({amountRecieved : e.target.value});}} ></input>
+                                                onChange={e =>{this.setState({amountRecieved : e.target.value});}}></input>
                                             </td>
 
                                             <td>
                                                 <label><b>Amount Loaded : </b></label><br></br>
                                                 <input className='input' type='number'  id='amtLod' required
-                                                /*onChange={e =>{this.setState({amountLoaded : e.target.value});}}*/
-                                                onSubmit={this.storeAmountLoaded} ></input>
+                                                onChange={this.storeAmountLoaded} ></input>
                                             </td>
 
                                             <td>
                                                 <label><b>Bonus : </b></label><br></br>
                                                 <input className='input' type='number'  id='bonus' required
-                                                /*onChange={e =>{this.setState({bonus : e.target.value});}}*/
                                                 onChange={this.storeBonus}></input>
                                             </td>
 
                                             <td>
                                                 <label><b>Total : </b></label><br></br>
                                                 <input  className='input'type='number' required   
-                                                disabled value={this.state.amountTotal}></input>
+                                                disabled value={this.handleTotal}></input>
                                             </td>
                                         </tr>   
                                     ) 
@@ -340,7 +347,7 @@ class Index extends Component {
                                             <td>
                                                 <label><b>Total : </b></label><br></br>
                                                 <input type='number'  disabled  
-                                                onChange={e =>{this.setState({redeemedTotal : e.target.value});}}></input>
+                                                value={this.state.amountTotal}></input>
                                             </td>
                                         </tr>
                                     )
@@ -409,7 +416,9 @@ class Index extends Component {
                         </table>
                     </div>
                     <div className='buttons'>
-                        <button type='submit' className='btn btn-cancel m-1'>Cancel</button>
+                        <button type='submit' className='btn btn-danger m-1'>
+                            <Link style={{textDecoration: 'none'}} to='/' className='link'>Cancel</Link>
+                        </button>
                         <button type='submit' className='btn btn-primary m-1' onClick={this.addData}>Confirm</button>
                     </div>
                 </div>

@@ -39,3 +39,8 @@
 .link {
   color: white;
 }
+
+.modalClass{
+  width: 20px;
+  max-width: none !important;
+}
