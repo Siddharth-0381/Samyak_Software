@@ -115,18 +115,6 @@ class Index extends Component {
         this.handleTotal()
     }
 
-    handleTotal = () => {
-        const amtLoaded = this.state.amountLoaded
-        const bonus = this.state.bonus
-
-        this.setState({ amountTotal: (parseInt(amtLoaded) + parseInt(bonus)) })
-
-    }
-
-    handleRedeemedTotal = () => {
-
-    }
-
     showDetails = (key, status) => {
         if(status === 'edit'){
             this.setState({ isOpen: true });
@@ -173,8 +161,7 @@ class Index extends Component {
     }
 
     updateChanges = (key) => {
-        const dbRef = ref(db, 'user')
-        update(ref(dbRef, '/' + key),
+        update(ref(db, 'user/' + key),
         {
             date : this.state.date,
             day : this.state.day,
@@ -186,7 +173,6 @@ class Index extends Component {
             customerCashAppTime : this.state.customerCashAppTime,
             facebookAccount : this.state.facebookAccount,
             gameName : this.state.gameName,
-            gameID : this.state.gameID,
             amountRecieved : this.state.amountRecieved,
             amountLoaded : this.state.amountLoaded,
             bonus : this.state.bonus,
@@ -338,7 +324,7 @@ class Index extends Component {
                                     <tr>
                                         <td>
                                             <label htmlFor="fbook"><b>Facebook Account :</b></label><br></br>
-                                            <select className='input' name="fbook" id="fbook" required
+                                            <select className='input' name="fbook" id="fbook" required value={this.state.facebookAccount}
                                                 onChange={e => { this.setState({ facebookAccount: e.target.value }); }}>
                                                 <option value="Austin Scott">Austin Scott</option>
                                                 <option value="Lipa Lynn">Lipa Lynn</option>
@@ -349,7 +335,8 @@ class Index extends Component {
 
                                         <td>
                                             <label htmlFor="action"><b>Action :</b></label><br></br>
-                                            <select className='input' name="action" id="action" onChange={this.handledropDown} required>
+                                            <select className='input' name="action" id="action" value={this.state.dropDown} 
+                                            onChange={this.handledropDown} required>
                                                 <option value="1">Inward</option>
                                                 <option value="2">Outward</option>
                                                 <option value="3">Transfer</option>
@@ -394,7 +381,7 @@ class Index extends Component {
                                                     <label><b>Amount Loaded : </b></label><br></br>
                                                     <input className='input' type='number' id='amtLod' required
                                                         /*onChange={e =>{this.setState({amountLoaded : e.target.value});}}*/
-                                                        onSubmit={this.storeAmountLoaded} ></input>
+                                                        onChange={this.storeAmountLoaded} ></input>
                                                 </td>
 
                                                 <td>
@@ -572,7 +559,8 @@ class Index extends Component {
                                     <tr>
                                         <td>
                                             <label htmlFor="fbook"><b>Facebook Account :</b></label><br></br>
-                                            <select className='input' name="fbook" id="fbook" required disabled>
+                                            <select className='input' name="fbook" id="fbook" 
+                                            value={this.state.facebookAccount} required disabled>
                                                 <option value="Austin Scott">Austin Scott</option>
                                                 <option value="Lipa Lynn">Lipa Lynn</option>
                                                 <option value="Grace Lessen">Grace Lessen</option>
@@ -582,7 +570,8 @@ class Index extends Component {
 
                                         <td>
                                             <label htmlFor="action"><b>Action :</b></label><br></br>
-                                            <select className='input' name="action" id="action" required disabled>
+                                            <select className='input' name="action" id="action" 
+                                            value={this.state.dropDown} required disabled>
                                                 <option value="1">Inward</option>
                                                 <option value="2">Outward</option>
                                                 <option value="3">Transfer</option>
@@ -619,25 +608,25 @@ class Index extends Component {
                                                 <td>
                                                     <label><b>Amount Recieved : </b></label><br></br>
                                                     <input className='input' type='number' id='amtRec' required disabled
-                                                    value={this.setState.amountRecieved}></input>
+                                                    value={this.state.amountRecieved}></input>
                                                 </td>
 
                                                 <td>
                                                     <label><b>Amount Loaded : </b></label><br></br>
                                                     <input className='input' type='number' id='amtLod' required disabled
-                                                    value={this.setState.amountLoaded}></input>
+                                                    value={this.state.amountLoaded}></input>
                                                 </td>
 
                                                 <td>
                                                     <label><b>Bonus : </b></label><br></br>
                                                     <input className='input' type='number' id='bonus' required disabled
-                                                    value={this.setState.bonus}></input>
+                                                    value={this.state.bonus}></input>
                                                 </td>
 
                                                 <td>
                                                     <label><b>Total : </b></label><br></br>
                                                     <input className='input' type='number' required disabled
-                                                    value={this.setState.amountTotal}></input>
+                                                    value={this.state.amountTotal}></input>
                                                 </td>
                                             </tr>
                                         )
@@ -649,25 +638,25 @@ class Index extends Component {
                                                 <td>
                                                     <label><b>Withdrawal Amount : </b></label><br></br>
                                                     <input type='number' required disabled
-                                                    value={this.setState.withdrawalAmount}></input>
+                                                    value={this.state.withdrawalAmount}></input>
                                                 </td>
 
                                                 <td>
                                                     <label><b>Withdrawal Amount : </b></label><br></br>
-                                                    <input type='number' requireddisabled
-                                                    value={this.setState.withdrawalAmount}></input>
+                                                    <input type='number' required disabled
+                                                    value={this.state.withdrawalAmount}></input>
                                                 </td>
 
                                                 <td>
                                                     <label><b>Tips : </b></label><br></br>
                                                     <input type='number' required disabled
-                                                    value={this.setState.tips}></input>
+                                                    value={this.state.tips}></input>
                                                 </td>
 
                                                 <td>
                                                     <label><b>Total : </b></label><br></br>
                                                     <input type='number' disabled
-                                                    value={this.setState.redeemedTotal}></input>
+                                                    value={this.state.redeemedTotal}></input>
                                                 </td>
                                             </tr>
                                         )
@@ -679,25 +668,25 @@ class Index extends Component {
                                                 <td>
                                                     <label><b>Amount Transferred : </b></label><br></br>
                                                     <input type='number' required disabled
-                                                    value={this.setState.amountTransferred}></input>
+                                                    value={this.state.amountTransferred}></input>
                                                 </td>
 
                                                 <td>
                                                     <label><b>Amount Transferred : </b></label><br></br>
                                                     <input type='number' required disabled
-                                                    value={this.setState.amountTransferred}></input>
+                                                    value={this.state.amountTransferred}></input>
                                                 </td>
 
                                                 <td>
                                                     <label><b>Bonus : </b></label><br></br>
                                                     <input type='number' required disabled
-                                                    value={this.setState.bonus}></input>
+                                                    value={this.state.bonus}></input>
                                                 </td>
 
                                                 <td>
                                                     <label><b>Total : </b></label><br></br>
                                                     <input type='number' disabled
-                                                    value={this.setState.amountTotal}></input>
+                                                    value={this.state.amountTotal}></input>
                                                 </td>
                                             </tr>
                                         )
@@ -709,25 +698,25 @@ class Index extends Component {
                                                 <td>
                                                     <label><b>Amount Recieved : </b></label><br></br>
                                                     <input type='number' required disabled
-                                                    value={this.setState.amountRecieved}></input>
+                                                    value={this.state.amountRecieved}></input>
                                                 </td>
 
                                                 <td>
                                                     <label><b>Amount Loaded : </b></label><br></br>
                                                     <input type='number' required disabled
-                                                    value={this.setState.amountLoaded}></input>
+                                                    value={this.state.amountLoaded}></input>
                                                 </td>
 
                                                 <td>
                                                     <label><b>Bonus : </b></label><br></br>
                                                     <input type='number' required disabled
-                                                    value={this.setState.bonus}></input>
+                                                    value={this.state.bonus}></input>
                                                 </td>
 
                                                 <td>
                                                     <label><b>Total : </b></label><br></br>
                                                     <input type='number' disabled
-                                                    value={this.setState.amountTotal}></input>
+                                                    value={this.state.amountTotal}></input>
                                                 </td>
                                             </tr>
                                         )
