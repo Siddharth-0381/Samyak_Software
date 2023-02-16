@@ -104,11 +104,44 @@ class Index extends Component {
 
     storeAmountLoaded = (event) => {
         this.setState({amountLoaded : event.target.value})
+
+        const amtLoaded = this.state.amountLoaded
+        const bonus = this.state.bonus
+        const trans = this.state.amountTransferred
+        const total = String(parseInt(amtLoaded) + parseInt(bonus) + parseInt(trans))
+        this.setState({amountTotal : total})
     }
 
     storeBonus = (event) => {
         this.setState({bonus : event.target.value})
+
+        const amtLoaded = this.state.amountLoaded
+        const bonus = this.state.bonus
+        const trans = this.state.amountTransferred
+        const total = String(parseInt(amtLoaded) + parseInt(bonus) + parseInt(trans))
+        this.setState({amountTotal : total})
     }
+
+    storeWithdrawal = (event) => {
+        this.setState({withdrawalAmount : event.target.value})
+
+        const widAmt = this.state.withdrawalAmount
+        const tip = this.state.tips
+        const redTotal = parseInt(widAmt) + parseInt(tip);
+        const string = String(redTotal)
+        this.setState({redeemedTotal: string})
+    }
+
+    storeTip = (event) => {
+        this.setState({tips : event.target.value})
+
+        const widAmt = this.state.withdrawalAmount
+        const tip = this.state.tips
+        const redTotal = parseInt(widAmt) + parseInt(tip);
+        const string = String(redTotal)
+        this.setState({redeemedTotal: string})
+    }
+    
 
     getAllInputs(){
         return{
@@ -138,18 +171,6 @@ class Index extends Component {
     addData(){
 
         const db = this.state.db;
-
-        const amtLoaded = this.state.amountLoaded
-        const bonus = this.state.bonus
-        const total = String(parseInt(amtLoaded) + parseInt(bonus))
-        this.setState({amountTotal : total})
-
-        const widAmt = this.state.withdrawalAmount
-        const tip = this.state.tips
-        const redTotal = parseInt(widAmt) + parseInt(tip);
-        const string = String(redTotal)
-        this.setState({redeemedTotal: string})
-
         const data=this.getAllInputs();
 
         set(ref(db, 'user/'+ this.state.gameID),
@@ -334,13 +355,13 @@ class Index extends Component {
                                             <td>
                                                 <label><b>Withdrawal Amount : </b></label><br></br>
                                                 <input type='number' required
-                                                onChange={e =>{this.setState({withdrawalAmount : e.target.value});}}></input>
+                                                onChange={this.storeWithdrawal}></input>
                                             </td>
 
                                             <td>
                                                 <label><b>Tips : </b></label><br></br>
                                                 <input type='number' required 
-                                                onChange={e =>{this.setState({tips : e.target.value});}}></input>
+                                                onChange={this.storeTip}></input>
                                             </td>
 
                                             <td>

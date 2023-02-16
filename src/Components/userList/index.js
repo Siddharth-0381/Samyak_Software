@@ -35,6 +35,7 @@ class Index extends Component {
             redeemedTotal: '',
             amountTransferred: ''
         }
+        
         this.handleShift = this.handleShift.bind()
     }
 
@@ -163,14 +164,11 @@ class Index extends Component {
     updateChanges = (key) => {
         update(ref(db, 'user/' + key),
         {
-            date : this.state.date,
-            day : this.state.day,
-            timeHours : this.state.timeHours,
-            shift : this.state.shift,
             cashApp : this.state.cashApp,
             cashTag : this.state.cashTag,
             customerCashAppName : this.state.customerCashAppName,
             customerCashAppTime : this.state.customerCashAppTime,
+            dropDown : this.state.dropDown,
             facebookAccount : this.state.facebookAccount,
             gameName : this.state.gameName,
             amountRecieved : this.state.amountRecieved,
@@ -180,7 +178,6 @@ class Index extends Component {
             tips : this.state.tips,
             redeemedTotal : this.state.redeemedTotal,
             amountTransferred : this.state.amountTransferred,
-            unique : this.state.unique
         })
         .then(()=> {alert('Data updated successfully!')})
         .catch((error)=>{alert(error)});
@@ -380,14 +377,12 @@ class Index extends Component {
                                                 <td>
                                                     <label><b>Amount Loaded : </b></label><br></br>
                                                     <input className='input' type='number' id='amtLod' required
-                                                        /*onChange={e =>{this.setState({amountLoaded : e.target.value});}}*/
                                                         onChange={this.storeAmountLoaded} ></input>
                                                 </td>
 
                                                 <td>
                                                     <label><b>Bonus : </b></label><br></br>
                                                     <input className='input' type='number' id='bonus' required
-                                                        /*onChange={e =>{this.setState({bonus : e.target.value});}}*/
                                                         onChange={this.storeBonus}></input>
                                                 </td>
 
