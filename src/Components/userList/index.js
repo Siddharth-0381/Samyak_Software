@@ -1,9 +1,12 @@
 import React, { Component } from 'react';
 import { BsDownload, BsEye, BsPencilSquare, BsTrash, BsUpload } from "react-icons/bs";
 import startFirebase from '../firebase';
-import { ref, onValue, remove, child, get, update } from 'firebase/database';
+import { ref, onValue, remove, child, get, update, set } from 'firebase/database';
 import { Table, Modal } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
+ import * as XLSX from 'xlsx';
+ import * as FileSaver from 'file-saver';
+import { read, utils, writeFile } from 'xlsx';
 
 const db = startFirebase();
 
@@ -13,6 +16,8 @@ class Index extends Component {
         super();
         this.state = {
             tableData: [],
+            table2: [],
+            InfoRows: [],
             gameID: '',
             isOpen: false,
             openView: false,
@@ -35,7 +40,7 @@ class Index extends Component {
             redeemedTotal: '',
             amountTransferred: ''
         }
-        
+
         this.handleShift = this.handleShift.bind()
     }
 
@@ -43,14 +48,99 @@ class Index extends Component {
         const dbRef = ref(db, 'user');
         onValue(dbRef, (snapshot) => {
             let records = [];
+            let list = [];
             snapshot.forEach(childSnapshot => {
                 let keyName = childSnapshot.key;
                 let data = childSnapshot.val();
                 records.push({ "key": keyName, "data": data });
+                list.push(data)
             });
             this.setState({ tableData: records });
-            this.setState({ gameID: records["gameID"] })
+            this.setState({ gameID: records["gameID"] });
+            this.setState({ table2: list });
         });
+    }
+
+    handleImport = ($event) => {
+        const files = $event.target.files;
+        if (files.length) {
+            const file = files[0];
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const wb = read(event.target.result);
+                const sheets = wb.SheetNames;
+
+                if (sheets.length) {
+                    const rows = utils.sheet_to_json(wb.Sheets[sheets[0]]);
+                    this.setState({ InfoRows: rows })
+                    
+                    
+                    
+                    for(let i of rows){
+                        console.log(i)
+                        set(ref(db, 'user/' + i['gameID']),
+                        {
+                            date: i['date'],
+                            day: i['day'],
+                            timeHours: i['timeHours'],
+                            shift: i['shift'],
+                            cashApp: i['cashApp'],
+                            cashTag: i['cashTag'],
+                            customerCashAppName: i['customerCashAppName'],
+                            customerCashAppTime: i['customerCashAppTime'],
+                            facebookAccount: i['facebookAccount'],
+                            gameName: i['gameName'],
+                            gameID: i['gameID'],
+                            amountRecieved: i['amountRecieved'],
+                            amountLoaded: i['amountLoaded'],
+                            bonus: i['bonus'],
+                            amountTotal: i['amountTotal'],
+                            withdrawalAmount: i['withdrawalAmount'],
+                            tips: i['tips'],
+                            redeemedTotal: i['redeemedTotal'],
+                            amountTransferred: i['amountTransferred'],
+                            dropDown: i['dropDown']
+                        })
+                        .catch((error) => { alert(error) });
+                    }
+                    alert("Data added successfully!!")
+                    
+                }
+
+            }
+            reader.readAsArrayBuffer(file);
+
+        }
+
+    }
+
+    handleExport = () => {
+        // const headings = [[
+        //     'CashApp',
+        //     'Cust. Cashapp',
+        //     'Amount Loaded',
+        //     'Redeemed Amount',
+        //     'Game ID',
+        //     'Game Name',
+        //     'Bonus'
+        // ]];
+        // const wb = utils.book_new();
+        // const ws = utils.json_to_sheet([]);
+        // utils.sheet_add_aoa(ws, headings);
+        // utils.sheet_add_json(ws, this.state.table2, { origin: 'A2', skipHeader: true });
+        // utils.book_append_sheet(wb, ws, 'Report');
+        // writeFile(wb, 'SamyakSoftware.xlsx');
+
+
+        const fileName = "Samyak"
+        const fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
+        const fileExtension = '.xlsx';
+        const ws = XLSX.utils.json_to_sheet(this.state.table2);
+        const wb = { Sheets: { 'data': ws }, SheetNames: ['data'] };
+        const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+        const data = new Blob([excelBuffer], {type: fileType});
+        FileSaver.saveAs(data, fileName + fileExtension);
+
     }
 
     handledropDown = (event) => {
@@ -117,12 +207,12 @@ class Index extends Component {
     }
 
     showDetails = (key, status) => {
-        if(status === 'edit'){
+        if (status === 'edit') {
             this.setState({ isOpen: true });
-        }else{
-            this.setState({openView: true});
+        } else {
+            this.setState({ openView: true });
         }
-        
+
         const dbref = ref(db, 'user')
         get(child(dbref, '/' + key)).then((snapshot) => {
             this.setState({
@@ -150,9 +240,9 @@ class Index extends Component {
     }
 
     hideDetails = () => {
-        this.setState({ 
+        this.setState({
             isOpen: false,
-            openView: false 
+            openView: false
         })
     }
 
@@ -163,24 +253,24 @@ class Index extends Component {
 
     updateChanges = (key) => {
         update(ref(db, 'user/' + key),
-        {
-            cashApp : this.state.cashApp,
-            cashTag : this.state.cashTag,
-            customerCashAppName : this.state.customerCashAppName,
-            customerCashAppTime : this.state.customerCashAppTime,
-            dropDown : this.state.dropDown,
-            facebookAccount : this.state.facebookAccount,
-            gameName : this.state.gameName,
-            amountRecieved : this.state.amountRecieved,
-            amountLoaded : this.state.amountLoaded,
-            bonus : this.state.bonus,
-            amountTotal : this.state.amountTotal,
-            tips : this.state.tips,
-            redeemedTotal : this.state.redeemedTotal,
-            amountTransferred : this.state.amountTransferred,
-        })
-        .then(()=> {alert('Data updated successfully!')})
-        .catch((error)=>{alert(error)});
+            {
+                cashApp: this.state.cashApp,
+                cashTag: this.state.cashTag,
+                customerCashAppName: this.state.customerCashAppName,
+                customerCashAppTime: this.state.customerCashAppTime,
+                dropDown: this.state.dropDown,
+                facebookAccount: this.state.facebookAccount,
+                gameName: this.state.gameName,
+                amountRecieved: this.state.amountRecieved,
+                amountLoaded: this.state.amountLoaded,
+                bonus: this.state.bonus,
+                amountTotal: this.state.amountTotal,
+                tips: this.state.tips,
+                redeemedTotal: this.state.redeemedTotal,
+                amountTransferred: this.state.amountTransferred,
+            })
+            .then(() => { alert('Data updated successfully!') })
+            .catch((error) => { alert(error) });
     }
 
 
@@ -202,15 +292,20 @@ class Index extends Component {
                     <div className='card-body'>
                         <div className='addDetails-div'>
                             <button type='submit' className='btn btn-primary m-2'>
-                                <Link style={{textDecoration: 'none'}} to='/userDetails' className='link'>Add Details</Link>
+                                <Link style={{ textDecoration: 'none' }} to='/userDetails' className='link'>Add Details</Link>
                             </button>
                             <form className="form-inline my-2 my-lg-0">
                                 <input className="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" />
                                 <button className="btn btn-outline-primary my-2 my-sm-0" type="submit">Search</button>
                             </form>
                             <form className="form-inline my-2 my-lg-0">
-                                <button className='btn btn-outline-primary my-2 my-sm-0 m-1' type='submit'> <BsDownload /> Import</button>
-                                <button className='btn btn-outline-primary my-2 my-sm-0 m-1' type='submit'> <BsUpload /> Export</button>
+                                {/* <button className='btn btn-outline-primary my-2 my-sm-0 m-1' type='file' onClick={this.handleImport}> <BsDownload /> Import</button> */}
+                                <div className="custom-file">
+                                    <input type="file" name="file" className="custom-file-input" id="inputGroupFile" required onChange={this.handleImport}
+                                        accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" />
+                                    <label className="custom-file-label" htmlFor="inputGroupFile">Choose file</label>
+                                </div>
+                                <button className='btn btn-outline-primary my-2 my-sm-0 m-1' type='submit' onClick={this.handleExport}> <BsUpload /> Export</button>
                             </form>
                         </div>
                         <div>
@@ -232,7 +327,7 @@ class Index extends Component {
                                     {this.state.tableData.map((rowdata, index) => {
                                         return (
                                             <tr>
-                                                <td>{index+1}</td>
+                                                <td>{index + 1}</td>
                                                 <td>{rowdata.data.cashApp}</td>
                                                 <td>{rowdata.data.customerCashAppName}</td>
                                                 <td>{rowdata.data.amountLoaded}</td>
@@ -241,15 +336,15 @@ class Index extends Component {
                                                 <td>{rowdata.data.gameName}</td>
                                                 <td>{rowdata.data.bonus}</td>
                                                 <td>
-                                                    <BsEye style={{ margin: "5px" }} onClick={() => this.showDetails(rowdata.key, "view")} 
-                                                    onMouseOver={({target})=>target.style.color="blue"} 
-                                                    onMouseOut={({target})=>target.style.color="black"}/>
+                                                    <BsEye style={{ margin: "5px" }} onClick={() => this.showDetails(rowdata.key, "view")}
+                                                        onMouseOver={({ target }) => target.style.color = "blue"}
+                                                        onMouseOut={({ target }) => target.style.color = "black"} />
                                                     <BsPencilSquare style={{ margin: "5px" }} onClick={() => this.showDetails(rowdata.key, "edit")}
-                                                    onMouseOver={({target})=>target.style.color="blue"}
-                                                    onMouseOut={({target})=>target.style.color="black"}/>
-                                                    <BsTrash style={{ margin: "5px" }} onClick={() => this.deleteData(rowdata.key)} 
-                                                    onMouseOver={({target})=>target.style.color="blue"}
-                                                    onMouseOut={({target})=>target.style.color="black"}/>
+                                                        onMouseOver={({ target }) => target.style.color = "blue"}
+                                                        onMouseOut={({ target }) => target.style.color = "black"} />
+                                                    <BsTrash style={{ margin: "5px" }} onClick={() => this.deleteData(rowdata.key)}
+                                                        onMouseOver={({ target }) => target.style.color = "blue"}
+                                                        onMouseOut={({ target }) => target.style.color = "black"} />
                                                 </td>
                                             </tr>
 
@@ -332,8 +427,8 @@ class Index extends Component {
 
                                         <td>
                                             <label htmlFor="action"><b>Action :</b></label><br></br>
-                                            <select className='input' name="action" id="action" value={this.state.dropDown} 
-                                            onChange={this.handledropDown} required>
+                                            <select className='input' name="action" id="action" value={this.state.dropDown}
+                                                onChange={this.handledropDown} required>
                                                 <option value="1">Inward</option>
                                                 <option value="2">Outward</option>
                                                 <option value="3">Transfer</option>
@@ -542,7 +637,7 @@ class Index extends Component {
 
                                         <td>
                                             <label><b>Customer cashapp name : </b></label><br></br>
-                                            <input className='input' type="text" required disabled value={this.state.customerCashAppName}/>
+                                            <input className='input' type="text" required disabled value={this.state.customerCashAppName} />
                                         </td>
 
                                         <td>
@@ -554,8 +649,8 @@ class Index extends Component {
                                     <tr>
                                         <td>
                                             <label htmlFor="fbook"><b>Facebook Account :</b></label><br></br>
-                                            <select className='input' name="fbook" id="fbook" 
-                                            value={this.state.facebookAccount} required disabled>
+                                            <select className='input' name="fbook" id="fbook"
+                                                value={this.state.facebookAccount} required disabled>
                                                 <option value="Austin Scott">Austin Scott</option>
                                                 <option value="Lipa Lynn">Lipa Lynn</option>
                                                 <option value="Grace Lessen">Grace Lessen</option>
@@ -565,8 +660,8 @@ class Index extends Component {
 
                                         <td>
                                             <label htmlFor="action"><b>Action :</b></label><br></br>
-                                            <select className='input' name="action" id="action" 
-                                            value={this.state.dropDown} required disabled>
+                                            <select className='input' name="action" id="action"
+                                                value={this.state.dropDown} required disabled>
                                                 <option value="1">Inward</option>
                                                 <option value="2">Outward</option>
                                                 <option value="3">Transfer</option>
@@ -603,25 +698,25 @@ class Index extends Component {
                                                 <td>
                                                     <label><b>Amount Recieved : </b></label><br></br>
                                                     <input className='input' type='number' id='amtRec' required disabled
-                                                    value={this.state.amountRecieved}></input>
+                                                        value={this.state.amountRecieved}></input>
                                                 </td>
 
                                                 <td>
                                                     <label><b>Amount Loaded : </b></label><br></br>
                                                     <input className='input' type='number' id='amtLod' required disabled
-                                                    value={this.state.amountLoaded}></input>
+                                                        value={this.state.amountLoaded}></input>
                                                 </td>
 
                                                 <td>
                                                     <label><b>Bonus : </b></label><br></br>
                                                     <input className='input' type='number' id='bonus' required disabled
-                                                    value={this.state.bonus}></input>
+                                                        value={this.state.bonus}></input>
                                                 </td>
 
                                                 <td>
                                                     <label><b>Total : </b></label><br></br>
                                                     <input className='input' type='number' required disabled
-                                                    value={this.state.amountTotal}></input>
+                                                        value={this.state.amountTotal}></input>
                                                 </td>
                                             </tr>
                                         )
@@ -633,25 +728,25 @@ class Index extends Component {
                                                 <td>
                                                     <label><b>Withdrawal Amount : </b></label><br></br>
                                                     <input type='number' required disabled
-                                                    value={this.state.withdrawalAmount}></input>
+                                                        value={this.state.withdrawalAmount}></input>
                                                 </td>
 
                                                 <td>
                                                     <label><b>Withdrawal Amount : </b></label><br></br>
                                                     <input type='number' required disabled
-                                                    value={this.state.withdrawalAmount}></input>
+                                                        value={this.state.withdrawalAmount}></input>
                                                 </td>
 
                                                 <td>
                                                     <label><b>Tips : </b></label><br></br>
                                                     <input type='number' required disabled
-                                                    value={this.state.tips}></input>
+                                                        value={this.state.tips}></input>
                                                 </td>
 
                                                 <td>
                                                     <label><b>Total : </b></label><br></br>
                                                     <input type='number' disabled
-                                                    value={this.state.redeemedTotal}></input>
+                                                        value={this.state.redeemedTotal}></input>
                                                 </td>
                                             </tr>
                                         )
@@ -663,25 +758,25 @@ class Index extends Component {
                                                 <td>
                                                     <label><b>Amount Transferred : </b></label><br></br>
                                                     <input type='number' required disabled
-                                                    value={this.state.amountTransferred}></input>
+                                                        value={this.state.amountTransferred}></input>
                                                 </td>
 
                                                 <td>
                                                     <label><b>Amount Transferred : </b></label><br></br>
                                                     <input type='number' required disabled
-                                                    value={this.state.amountTransferred}></input>
+                                                        value={this.state.amountTransferred}></input>
                                                 </td>
 
                                                 <td>
                                                     <label><b>Bonus : </b></label><br></br>
                                                     <input type='number' required disabled
-                                                    value={this.state.bonus}></input>
+                                                        value={this.state.bonus}></input>
                                                 </td>
 
                                                 <td>
                                                     <label><b>Total : </b></label><br></br>
                                                     <input type='number' disabled
-                                                    value={this.state.amountTotal}></input>
+                                                        value={this.state.amountTotal}></input>
                                                 </td>
                                             </tr>
                                         )
@@ -693,25 +788,25 @@ class Index extends Component {
                                                 <td>
                                                     <label><b>Amount Recieved : </b></label><br></br>
                                                     <input type='number' required disabled
-                                                    value={this.state.amountRecieved}></input>
+                                                        value={this.state.amountRecieved}></input>
                                                 </td>
 
                                                 <td>
                                                     <label><b>Amount Loaded : </b></label><br></br>
                                                     <input type='number' required disabled
-                                                    value={this.state.amountLoaded}></input>
+                                                        value={this.state.amountLoaded}></input>
                                                 </td>
 
                                                 <td>
                                                     <label><b>Bonus : </b></label><br></br>
                                                     <input type='number' required disabled
-                                                    value={this.state.bonus}></input>
+                                                        value={this.state.bonus}></input>
                                                 </td>
 
                                                 <td>
                                                     <label><b>Total : </b></label><br></br>
                                                     <input type='number' disabled
-                                                    value={this.state.amountTotal}></input>
+                                                        value={this.state.amountTotal}></input>
                                                 </td>
                                             </tr>
                                         )
