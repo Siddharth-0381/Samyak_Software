@@ -142,6 +142,32 @@ class Index extends Component {
         this.setState({redeemedTotal: string})
     }
     
+    handleTotal1=()=>{
+        const amtLoaded = this.state.amountLoaded;
+        const bonus = this.state.bonus;
+        //const amtRcvd = this.state.amountRecieved;
+
+        const tot= parseInt(amtLoaded)+parseInt(bonus)
+        return tot;
+    }
+
+    handleTotal2=()=>{
+        const wdAmount = this.state.withdrawalAmount;
+        const tip = this.state.tips;
+        
+
+        const tot= parseInt(wdAmount)+parseInt(tip)
+        return tot;
+    }
+    handleTotal3=()=>{
+        const amtTrans = this.state.amountTransferred;
+        const bonus = this.state.bonus;
+        
+
+        const tot= parseInt(amtTrans)+parseInt(bonus)
+        return tot;
+    }
+
 
     getAllInputs(){
         return{
@@ -337,7 +363,7 @@ class Index extends Component {
                                             <td>
                                                 <label><b>Total : </b></label><br></br>
                                                 <input  className='input'type='number' required   
-                                                disabled value={this.state.amountTotal}></input>
+                                                disabled value={this.handleTotal1()}></input>
                                             </td>
                                         </tr>   
                                     ) 
@@ -354,7 +380,7 @@ class Index extends Component {
 
                                             <td>
                                                 <label><b>Withdrawal Amount : </b></label><br></br>
-                                                <input type='number' required
+                                                <input type='number'
                                                 onChange={this.storeWithdrawal}></input>
                                             </td>
 
@@ -367,7 +393,7 @@ class Index extends Component {
                                             <td>
                                                 <label><b>Total : </b></label><br></br>
                                                 <input type='number'  disabled  
-                                                value={this.state.redeemedTotal}></input>
+                                                value={this.handleTotal2()}></input>
                                             </td>
                                         </tr>
                                     )
@@ -384,8 +410,7 @@ class Index extends Component {
 
                                             <td>
                                                 <label><b>Amount Transferred : </b></label><br></br>
-                                                <input type='number' required
-                                                onChange={e =>{this.setState({amountTransferred : e.target.value});}}></input>
+                                                <input type='number' ></input>
                                             </td>
 
                                             <td>
@@ -397,7 +422,7 @@ class Index extends Component {
                                             <td>
                                                 <label><b>Total : </b></label><br></br>
                                                 <input type='number'  disabled 
-                                                value={this.state.amountTotal}></input>
+                                                value={this.handleTotal3()}></input>
                                             </td>
                                         </tr>
                                     )
@@ -427,7 +452,7 @@ class Index extends Component {
                                             <td>
                                                 <label><b>Total : </b></label><br></br>
                                                 <input type='number'  disabled 
-                                                value={this.state.amountTotal}></input>
+                                                value={this.handleTotal1()}></input>
                                             </td>
                                         </tr>
                                     )

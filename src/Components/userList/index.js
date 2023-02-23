@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
-import { BsDownload, BsEye, BsPencilSquare, BsTrash, BsUpload } from "react-icons/bs";
+import {BsEye, BsPencilSquare, BsTrash, BsUpload } from "react-icons/bs";
 import startFirebase from '../firebase';
 import { ref, onValue, remove, child, get, update, set } from 'firebase/database';
 import { Table, Modal } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
  import * as XLSX from 'xlsx';
  import * as FileSaver from 'file-saver';
-import { read, utils, writeFile } from 'xlsx';
+import { read, utils } from 'xlsx';
 
 const db = startFirebase();
 
@@ -115,23 +115,7 @@ class Index extends Component {
     }
 
     handleExport = () => {
-        // const headings = [[
-        //     'CashApp',
-        //     'Cust. Cashapp',
-        //     'Amount Loaded',
-        //     'Redeemed Amount',
-        //     'Game ID',
-        //     'Game Name',
-        //     'Bonus'
-        // ]];
-        // const wb = utils.book_new();
-        // const ws = utils.json_to_sheet([]);
-        // utils.sheet_add_aoa(ws, headings);
-        // utils.sheet_add_json(ws, this.state.table2, { origin: 'A2', skipHeader: true });
-        // utils.book_append_sheet(wb, ws, 'Report');
-        // writeFile(wb, 'SamyakSoftware.xlsx');
-
-
+        
         const fileName = "Samyak"
         const fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
         const fileExtension = '.xlsx';
@@ -297,15 +281,18 @@ class Index extends Component {
                             <form className="form-inline my-2 my-lg-0">
                                 <input className="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" />
                                 <button className="btn btn-outline-primary my-2 my-sm-0" type="submit">Search</button>
+                                <button className='btn btn-outline-primary my-2 my-sm-0 m-5' type='submit' onClick={this.handleExport}> <BsUpload /> Export</button>
                             </form>
                             <form className="form-inline my-2 my-lg-0">
+                           
                                 {/* <button className='btn btn-outline-primary my-2 my-sm-0 m-1' type='file' onClick={this.handleImport}> <BsDownload /> Import</button> */}
                                 <div className="custom-file">
+    
                                     <input type="file" name="file" className="custom-file-input" id="inputGroupFile" required onChange={this.handleImport}
                                         accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" />
-                                    <label className="custom-file-label" htmlFor="inputGroupFile">Choose file</label>
+                                    <label className="custom-file-label" >Import .csv file</label>
                                 </div>
-                                <button className='btn btn-outline-primary my-2 my-sm-0 m-1' type='submit' onClick={this.handleExport}> <BsUpload /> Export</button>
+                                
                             </form>
                         </div>
                         <div>
